@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 LABEL maintainer="Simon Diesenreiter"
  
-ENV DEFAULTMAP de_dust2
+ENV DEFAULTMAP gg_fy_simpsons
 ENV MAXPLAYERS 10
 ENV PORT 27015
 ENV CLIENTPORT 27005
@@ -17,7 +17,7 @@ EXPOSE 1200/udp
 ENV PODBOTPASS $RCONPASS
  
 RUN dpkg --add-architecture i386
-RUN apt-get update && apt-get -qqy install lib32gcc1 wget sudo unzip
+RUN apt-get update && apt-get -qqy install lib32gcc1 wget sudo unzip unrar
  
 # script refuses to run in root, create user
 RUN useradd -m csserver
@@ -79,6 +79,14 @@ RUN cp -r ./addons/amxmodx/* ../cstrike/addons/amxmodx
 WORKDIR /home/csserver/cs16
 RUN rm -R amxcs_tmp
 
+# install gungame mod
+RUN wget -O gungame.rar 'https://gamebanana.com/dl/1192'
+RUN unrar x gungame.rar
+RUN cp -r GunGame\ AMXX\ 2.13b/GunGame\ AMXX\ 2.13b/addons/* ./cstrike/addons/
+RUN cp -r GunGame\ AMXX\ 2.13b/GunGame\ AMXX\ 2.13b/sound/* ./cstrike/sound/
+RUN rm -R GunGame\ AMXX\ 2.13b
+RUN echo "gungame.amxx" >> cstrike/addons/amxmodx/configs/plugins.ini
+
 # configure AMX Mod X
 RUN echo "linux addons/amxmodx/dlls/amxmodx_mm_i386.so" >> cstrike/addons/metamod/plugins.ini
 RUN mkdir -p amxconfig_tmp
@@ -88,20 +96,41 @@ RUN mv amxx_podbotmenu.amxx ../cstrike/addons/amxmodx/plugins
 WORKDIR /home/csserver/cs16
 RUN rm -R amxconfig_tmp
 RUN echo "amxx_podbotmenu.amxx" >> cstrike/addons/amxmodx/configs/plugins.ini
-RUN echo "\"STEAM_1:0:13868677\" \"\" \"abcdefghijklmnopqrstu\" \"ce\" ;" >> cstrike/addons/amxmodx/configs/users.ini
-RUN echo "amx_addclientmenuitem \"Podbot Menu\" \"amx_pbmenu\" \"cu\" \"podbotmenu\"" >> cstrike/addons/amxmodx/configs/custommenuitems.cfg
+RUN echo "\"STEAM_0:0:13868677\" \"\" \"abcdefghijklmnopqrstu\" \"ce\" ;" >> cstrike/addons/amxmodx/configs/users.ini
+RUN echo "amx_addclientmenuitem \"Podbot Menu\" \"amx_pbmenu\" \"\" \"POD-Bot mm\"" >> cstrike/addons/amxmodx/configs/custommenuitems.cfg
+RUN echo "\"Podbot menu\" \"amx_pbmenu\" \"b\" \"u\"" >> cstrike/addons/amxmodx/configs/cmds.ini
+RUN echo "\"Map menu\" \"amx_mapmenu\" \"b\" \"u\"" >> cstrike/addons/amxmodx/configs/cmds.ini
+RUN sed 's/;fakemeta/fakemeta/g' cstrike/addons/amxmodx/configs/modules.ini >> cstrike/addons/amxmodx/configs/modules.initmp
+RUN rm cstrike/addons/amxmodx/configs/modules.ini
+RUN mv cstrike/addons/amxmodx/configs/modules.initmp cstrike/addons/amxmodx/configs/modules.ini
+RUN sed 's/;hamsandwich/hamsandwich/g' cstrike/addons/amxmodx/configs/modules.ini >> cstrike/addons/amxmodx/configs/modules.initmp
+RUN rm cstrike/addons/amxmodx/configs/modules.ini
+RUN mv cstrike/addons/amxmodx/configs/modules.initmp cstrike/addons/amxmodx/configs/modules.ini
+
+# setup maps, mapcycle and pluginconfigs per map
+ADD maps/gfx/env/* ./cstrike/gfx/env/
+ADD maps/maps/* ./cstrike/maps/
+ADD maps/models/* ./cstrike/models/
+ADD maps/overviews/* ./cstrike/overviews/
+ADD maps/sprites/* ./cstrike/sprites/
+ADD maps/sound/ambience/* ./cstrike/sound/ambience/
+ADD maps/wads/* ./cstrike/
+RUN rm ./cstrike/addons/amxmodx/configs/maps.ini
+ADD maps/maps.ini ./cstrike/addons/amxmodx/configs/
+RUN mkdir ./cstrike/addons/amxmodx/configs/maps
+ADD maps/mapconfig/* ./cstrike/addons/amxmodx/configs/maps/
+ADD maps/waypoints/* ./cstrike/addons/podbot/wptdefault/
 
 # Start the server
 ADD cfg/* ./
-RUN sed 's/<SERVER_NAME>/$SERVERNAME/g' server.cfg
-RUN sed 's/<RCON_PASSWD>/$RCONPASS/g' server.cfg
-RUN sed 's/"your_password"/"$PODBOTPASS"/g' ./cstrike/addons/podbot/podbot.cfg >> ./cstrike/addons/podbot/podbot.cfgtmp
+RUN sed 's/<SERVER_NAME>/$SERVERNAME/g' server.cfg >> server.cfgtmp
+RUN rm server.cfg
+RUN mv server.cfgtmp server.cfg
+RUN sed 's/<RCON_PASSWD>/$RCONPASS/g' server.cfg >> server.cfgtmp
+RUN rm server.cfg
+RUN mv server.cfgtmp server.cfg
+RUN sed 's/"pb menu"/"amx_cmdmenu"/g' ./cstrike/addons/podbot/podbot.cfg >> ./cstrike/addons/podbot/podbot.cfgtmp
 RUN rm ./cstrike/addons/podbot/podbot.cfg
 RUN mv ./cstrike/addons/podbot/podbot.cfgtmp ./cstrike/addons/podbot/podbot.cfg
-RUN sed 's/"pb menu"/"amx_menu"/g' ./cstrike/addons/podbot/podbot.cfg >> ./cstrike/addons/podbot/podbot.cfgtmp
-RUN rm ./cstrike/addons/podbot/podbot.cfg
-RUN mv ./cstrike/addons/podbot/podbot.cfgtmp ./cstrike/addons/podbot/podbot.cfg
-RUN sed 's/amx_password_field "_pw"/amx_password_field "_amxpw"/g' ./cstrike/addons/amxmodx/config/amxx.cfg
-
 
 ENTRYPOINT ./hlds_run -game cstrike -strictportbind -ip 0.0.0.0 -port $PORT +clientport $CLIENTPORT  +map $DEFAULTMAP -maxplayers $MAXPLAYERS +hostname "$SERVERNAME"

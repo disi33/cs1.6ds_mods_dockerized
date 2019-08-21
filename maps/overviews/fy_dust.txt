@@ -1,0 +1,14 @@
+// overview description file for fy_dust.bsp
+
+global 
+{
+	ZOOM	3.69
+	ORIGIN	384 	-640	-289
+	ROTATED	0
+}
+
+layer 
+{
+	IMAGE	"overviews/fy_dust.bmp"
+	HEIGHT	-289
+}

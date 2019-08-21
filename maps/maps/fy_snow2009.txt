@@ -1,0 +1,5 @@
+a map by Septimius A.I.
+o harta de Septimius A.I.
+
+place the map in  the directory cstrike/maps
+bagati-o in folderul maps din folderul cstrike
