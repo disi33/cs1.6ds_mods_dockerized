@@ -1,0 +1,17 @@
+image:
+  repository: csserveracr.azurecr.io
+  tag: 5
+
+imageCredentials:
+  registry: csserveracr.azurecr.io
+  username: CSServeracr
+  password: iU+PUXMiELmNJROxxA8K5Gsf5Yp8e8Xe
+
+imagePullSecrets:
+  name: disiclusterdockerauth
+
+secrets: {}
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
