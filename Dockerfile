@@ -86,6 +86,15 @@ RUN cp -r GunGame\ AMXX\ 2.13b/GunGame\ AMXX\ 2.13b/addons/* ./cstrike/addons/
 RUN cp -r GunGame\ AMXX\ 2.13b/GunGame\ AMXX\ 2.13b/sound/* ./cstrike/sound/
 RUN rm -R GunGame\ AMXX\ 2.13b
 RUN echo "gungame.amxx" >> cstrike/addons/amxmodx/configs/plugins.ini
+# original GunGame mod website is unavailable, this version has custom configs we don't want, we need to:
+# - turn off teamplay by default
+# - restore original weapon order
+RUN sed 's/m249,awp,sg550,g3sg1,aug,sg552,m4a1,scout,ak47,famas,galil,p90,ump45,mp5navy,mac10,tmp,xm1014,m3,deagle,elite,fiveseven,p228,usp,glock18,knife/glock18,usp,p228,deagle,fiveseven,elite,m3,xm1014,tmp,mac10,mp5navy,ump45,p90,galil,famas,ak47,scout,m4a1,sg552,aug,m249,hegrenade,knife/g' cstrike/addons/amxmodx/configs/gungame.cfg >> cstrike/addons/amxmodx/configs/gungame.cfgtmp
+RUN rm cstrike/addons/amxmodx/configs/gungame.cfg
+RUN mv cstrike/addons/amxmodx/configs/gungame.cfgtmp cstrike/addons/amxmodx/configs/gungame.cfg
+RUN sed 's/gg_teamplay 1/gg_teamplay 0/g' cstrike/addons/amxmodx/configs/gungame.cfg >> cstrike/addons/amxmodx/configs/gungame.cfgtmp
+RUN rm cstrike/addons/amxmodx/configs/gungame.cfg
+RUN mv cstrike/addons/amxmodx/configs/gungame.cfgtmp cstrike/addons/amxmodx/configs/gungame.cfg
 
 # configure AMX Mod X
 RUN echo "linux addons/amxmodx/dlls/amxmodx_mm_i386.so" >> cstrike/addons/metamod/plugins.ini
