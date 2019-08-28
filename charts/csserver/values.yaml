@@ -1,6 +1,6 @@
 image:
   repository: csserveracr.azurecr.io
-  tag: 5
+  tag: 8
 
 imageCredentials:
   registry: csserveracr.azurecr.io
