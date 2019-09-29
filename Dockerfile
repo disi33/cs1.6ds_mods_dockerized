@@ -89,10 +89,20 @@ RUN echo "gungame.amxx" >> cstrike/addons/amxmodx/configs/plugins.ini
 # original GunGame mod website is unavailable, this version has custom configs we don't want, we need to:
 # - turn off teamplay by default
 # - restore original weapon order
+# - turn off deathmatch
 RUN sed 's/m249,awp,sg550,g3sg1,aug,sg552,m4a1,scout,ak47,famas,galil,p90,ump45,mp5navy,mac10,tmp,xm1014,m3,deagle,elite,fiveseven,p228,usp,glock18,knife/glock18,usp,p228,deagle,fiveseven,elite,m3,xm1014,tmp,mac10,mp5navy,ump45,p90,galil,famas,ak47,scout,m4a1,sg552,aug,m249,hegrenade,knife/g' cstrike/addons/amxmodx/configs/gungame.cfg >> cstrike/addons/amxmodx/configs/gungame.cfgtmp
 RUN rm cstrike/addons/amxmodx/configs/gungame.cfg
 RUN mv cstrike/addons/amxmodx/configs/gungame.cfgtmp cstrike/addons/amxmodx/configs/gungame.cfg
 RUN sed 's/gg_teamplay 1/gg_teamplay 0/g' cstrike/addons/amxmodx/configs/gungame.cfg >> cstrike/addons/amxmodx/configs/gungame.cfgtmp
+RUN rm cstrike/addons/amxmodx/configs/gungame.cfg
+RUN mv cstrike/addons/amxmodx/configs/gungame.cfgtmp cstrike/addons/amxmodx/configs/gungame.cfg
+RUN sed 's/gg_max_lvl 3/gg_max_lvl 0/g' cstrike/addons/amxmodx/configs/gungame.cfg >> cstrike/addons/amxmodx/configs/gungame.cfgtmp
+RUN rm cstrike/addons/amxmodx/configs/gungame.cfg
+RUN mv cstrike/addons/amxmodx/configs/gungame.cfgtmp cstrike/addons/amxmodx/configs/gungame.cfg
+RUN sed 's/gg_warmup_timer_setting 60/gg_warmup_timer_setting 20/g' cstrike/addons/amxmodx/configs/gungame.cfg >> cstrike/addons/amxmodx/configs/gungame.cfgtmp
+RUN rm cstrike/addons/amxmodx/configs/gungame.cfg
+RUN mv cstrike/addons/amxmodx/configs/gungame.cfgtmp cstrike/addons/amxmodx/configs/gungame.cfg
+RUN sed 's/gg_dm 1/gg_dm 0/g' cstrike/addons/amxmodx/configs/gungame.cfg >> cstrike/addons/amxmodx/configs/gungame.cfgtmp
 RUN rm cstrike/addons/amxmodx/configs/gungame.cfg
 RUN mv cstrike/addons/amxmodx/configs/gungame.cfgtmp cstrike/addons/amxmodx/configs/gungame.cfg
 
@@ -106,7 +116,8 @@ WORKDIR /home/csserver/cs16
 RUN rm -R amxconfig_tmp
 RUN echo "amxx_podbotmenu.amxx" >> cstrike/addons/amxmodx/configs/plugins.ini
 RUN echo "\"STEAM_0:0:13868677\" \"\" \"abcdefghijklmnopqrstu\" \"ce\" ;" >> cstrike/addons/amxmodx/configs/users.ini
-RUN echo "amx_addclientmenuitem \"Podbot Menu\" \"amx_pbmenu\" \"\" \"POD-Bot mm\"" >> cstrike/addons/amxmodx/configs/custommenuitems.cfg
+RUN echo "amx_addclientmenuitem \"Podbot Menu\" \"amx_pbmenu\" \"u\" \"POD-Bot mm\"" >> cstrike/addons/amxmodx/configs/custommenuitems.cfg
+RUN echo "amx_addclientmenuitem \"Map Menu\" \"amx_mapmenu\" \"u\" \"POD-Bot mm\"" >> cstrike/addons/amxmodx/configs/custommenuitems.cfg
 RUN echo "\"Podbot menu\" \"amx_pbmenu\" \"b\" \"u\"" >> cstrike/addons/amxmodx/configs/cmds.ini
 RUN echo "\"Map menu\" \"amx_mapmenu\" \"b\" \"u\"" >> cstrike/addons/amxmodx/configs/cmds.ini
 RUN sed 's/;fakemeta/fakemeta/g' cstrike/addons/amxmodx/configs/modules.ini >> cstrike/addons/amxmodx/configs/modules.initmp
